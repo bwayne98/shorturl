@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
-	"os"
+	"os/user"
 	"shorturl/m/service/member"
 	"shorturl/m/service/short"
 
@@ -12,17 +12,16 @@ import (
 )
 
 var Route *gin.Engine
+var User user.User
 
 func main() {
 
-	os.Setenv("TZ", "Asia/Taipei")
-
-	Route = gin.Default()
 	db, err := sql.Open("postgres", "postgresql://wayne:123456qq@pg:5432/shorturl?sslmode=disable")
 	if err != nil {
 		log.Fatal("cant connect to db:", err)
 	}
 
+	Route = gin.Default()
 	ApiGroup := Route.Group("/api")
 
 	memberGroup := ApiGroup.Group("/member")

@@ -1,12 +1,12 @@
 package short
 
 import (
-	"database/sql"
+	"shorturl/m/db/model/shorturl"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Register(route *gin.RouterGroup, db *sql.DB){
+func Register(route *gin.RouterGroup, db shorturl.DBTX){
 
 	controller := New(db)
 

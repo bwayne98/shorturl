@@ -2,7 +2,6 @@ package short
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -22,7 +21,7 @@ type Controller struct {
 	query *shorturl.Queries
 }
 
-func New(db *sql.DB) *Controller {
+func New(db shorturl.DBTX) *Controller {
 	query := shorturl.New(db)
 	return &Controller{query: query}
 }

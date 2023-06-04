@@ -50,10 +50,7 @@ func TestCreateShorturl(t *testing.T){
 func TestGetMatchShorturl(t *testing.T){
 	shorturl := creatRandomShorturl(t)
 
-	origin, err := testQuery.GetMatchShorturl(context.Background(), GetMatchShorturlParams{
-		Match: shorturl.Match,
-		ExpiredAt: time.Now(),
-	})
+	origin, err := testQuery.GetMatchShorturl(context.Background(), shorturl.Match)
 
 	require.NoError(t, err)
 	require.Equal(t, shorturl.Origin, origin)
