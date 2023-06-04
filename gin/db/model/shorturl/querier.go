@@ -10,9 +10,10 @@ import (
 )
 
 type Querier interface {
+	CountMatchShorturl(ctx context.Context, match string) (int64, error)
 	CreateShorturl(ctx context.Context, arg CreateShorturlParams) (Shorturl, error)
 	DeleteShorturl(ctx context.Context, arg DeleteShorturlParams) error
-	GetMatchShorturl(ctx context.Context, arg GetMatchShorturlParams) (string, error)
+	GetMatchShorturl(ctx context.Context, match string) (string, error)
 	ListUserShorturl(ctx context.Context, userID sql.NullInt32) ([]ListUserShorturlRow, error)
 	UpdateExpired(ctx context.Context, arg UpdateExpiredParams) (Shorturl, error)
 }

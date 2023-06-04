@@ -18,7 +18,7 @@ RETURNING *;
 
 -- name: GetMatchShorturl :one
 SELECT origin FROM shorturls 
-WHERE match = $1 AND expired_at > $2 
+WHERE match = $1 AND expired_at > (now()) 
 ORDER BY id LIMIT 1;
 
 -- name: UpdateExpired :one
@@ -36,3 +36,6 @@ AND user_id = $2;
 SELECT id, origin, match, expired_at, created_at
 FROM shorturls
 WHERE user_id = $1;
+
+-- name: CountMatchShorturl :one
+SELECT COUNT(id) FROM shorturls WHERE match = $1;

@@ -11,6 +11,17 @@ import (
 	"time"
 )
 
+const countMatchShorturl = `-- name: CountMatchShorturl :one
+SELECT COUNT(id) FROM shorturls WHERE match = $1
+`
+
+func (q *Queries) CountMatchShorturl(ctx context.Context, match string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countMatchShorturl, match)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createShorturl = `-- name: CreateShorturl :one
 INSERT INTO shorturls (
   origin, match, user_id, expired_at
@@ -65,17 +76,12 @@ func (q *Queries) DeleteShorturl(ctx context.Context, arg DeleteShorturlParams) 
 
 const getMatchShorturl = `-- name: GetMatchShorturl :one
 SELECT origin FROM shorturls 
-WHERE match = $1 AND expired_at > $2 
+WHERE match = $1 AND expired_at > (now()) 
 ORDER BY id LIMIT 1
 `
 
-type GetMatchShorturlParams struct {
-	Match     string    `json:"match"`
-	ExpiredAt time.Time `json:"expired_at"`
-}
-
-func (q *Queries) GetMatchShorturl(ctx context.Context, arg GetMatchShorturlParams) (string, error) {
-	row := q.db.QueryRowContext(ctx, getMatchShorturl, arg.Match, arg.ExpiredAt)
+func (q *Queries) GetMatchShorturl(ctx context.Context, match string) (string, error) {
+	row := q.db.QueryRowContext(ctx, getMatchShorturl, match)
 	var origin string
 	err := row.Scan(&origin)
 	return origin, err
