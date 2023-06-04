@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS shorturls;
+DROP TABLE IF EXISTS exchage_tokens;
+DROP TABLE IF EXISTS users;
