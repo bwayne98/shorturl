@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  go:
+    depends_on:
+      - pg
+    build: 
+      context: ./
+      dockerfile: go.dockerfile
+    working_dir: /source
+    volumes:
+      - ../gin:/source
+    command: gin -appPort 8000 run main go
+    networks:
+      - db
+      - api
+
+  next:
+    image: node:16.20.0
+    working_dir: /source
+    volumes:
+      - ../next:/source
+    command: yarn run dev
+    networks:
+      - api
+
+  pg:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: "${PG_USERNAME}"
+      POSTGRES_PASSWORD: "${PG_PASSWORD}" 
+      POSTGRES_DB: "${PG_DATABASE}"
+    ports:
+      - 5432:5432
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - db
+
+  adminer:
+    image: adminer:latest
+    ports:
+      - 8080:8080
+    networks:
+      - db
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    environment:
+      TUNNEL_TOKEN: "${TUNNEL_TOKEN}"
+    command: tunnel run
+    networks:
+      - api
+    depends_on:
+      - next
+      - go
+
+
+networks:
+  api:
+  db:
