@@ -6,10 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Register(route *gin.RouterGroup, db shorturl.DBTX){
+func Register(route *gin.RouterGroup, db shorturl.DBTX) {
 
 	controller := New(db)
 
-	route.GET("/make", controller.Make)
-	route.GET("/match", controller.Match)
+	route.POST("/make", controller.Make)
+	route.POST("/match", controller.Match)
 }
