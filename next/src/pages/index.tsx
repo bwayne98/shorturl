@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { styled } from 'styled-components'
-import IndexInput from './IndexInput';
+import IndexInput from '../components/IndexInput';
 
 
 const MainContainer = styled.div`
