@@ -3,6 +3,60 @@
 import { useRef, useState } from "react";
 import { styled } from "styled-components";
 
+export default function IndexInput() {
+
+  const [result, setResult] = useState<string>('');
+  const [clicked, setClicked] = useState<boolean>(false);
+  const url = useRef<HTMLInputElement>(null);
+
+  const onCLickGenerate = async () => {
+    if (clicked) return;
+    setClicked(true);
+
+    const apiUrl = `https://${location.host}/api/short/make`;
+    const data: ShortMakeBody = {
+      origin: url.current?.value as string
+    };
+    const response = await fetchShortMake(apiUrl, data);
+    if (response) {
+      setResult(response.shortUrl);
+    }
+
+    setTimeout(() => {
+      setClicked(false);
+    }, 500);
+  }
+
+  const onClickCopy = () => {
+    navigator.clipboard.writeText(result);
+  }
+
+  return (
+    <Container clicked={clicked}>
+      {result.length > 0 ?
+        (
+          <>
+            <p>{result}</p>
+            <div className="button">
+              <button onClick={onClickCopy}>Copy</button>
+              <button onClick={() => setResult("")}>Back</button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="input">
+              <label htmlFor="">Origin Url</label>
+              <input ref={url} type="text" placeholder="https://example.com" />
+            </div >
+            <div className="button">
+              <button onClick={onCLickGenerate}>Generate</button>
+            </div>
+          </>
+        )
+      }
+    </Container >
+  )
+}
 
 const Container = styled.div<{ clicked: boolean }>`
     width: 450px;
@@ -50,6 +104,7 @@ const Container = styled.div<{ clicked: boolean }>`
       display: flex;
       justify-content:center;
       padding: 15px;
+      gap: 15px;
       > button{
         background-color: ${props => props.clicked ? 'rgba(200,200,200,.2)' : 'transparent'};
         outline-style: none;
@@ -105,56 +160,3 @@ const fetchShortMake = async (url: string, data: ShortMakeBody): Promise<ShortMa
   }
 }
 
-export default function IndexInput() {
-
-  const [result, setResult] = useState<string>('');
-  const [clicked, setClicked] = useState<boolean>(false);
-  const url = useRef<HTMLInputElement>(null);
-
-  const onCLickGenerate = async () => {
-    if (clicked) return;
-    setClicked(true);
-
-    const apiUrl = `https://${location.host}/api/short/make`;
-    const data: ShortMakeBody = {
-      origin: url.current?.value as string
-    };
-    const response = await fetchShortMake(apiUrl, data);
-    if (response) {
-      setResult(response.shortUrl);
-    }
-
-    setTimeout(() => {
-      setClicked(false);
-    }, 500);
-  }
-
-  const onClickCopy = () => {
-    navigator.clipboard.writeText(result);
-  }
-
-  return (
-    <Container clicked={clicked}>
-      {result.length > 0 ?
-        (
-          <>
-            <p>{result}</p>
-            <div className="button">
-              <button onClick={onClickCopy}>Copy</button>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="input">
-              <label htmlFor="">Origin Url</label>
-              <input ref={url} type="text" placeholder="https://example.com" />
-            </div >
-            <div className="button">
-              <button onClick={onCLickGenerate}>Generate</button>
-            </div>
-          </>
-        )
-      }
-    </Container >
-  )
-}
