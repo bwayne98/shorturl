@@ -1,22 +1,22 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "./db/model/shorturl/query.sql"
-    schema: "./db/model/shorturl/query.sql"
+    queries: "./db/store/shorturl/query.sql"
+    schema: "./db/store/shorturl/query.sql"
     gen:
       go:
         package: "shorturl"
-        out: "./db/model/shorturl/"
+        out: "./db/store/shorturl/"
         emit_interface: true
         emit_empty_slices: true
         emit_json_tags: true
   - engine: "postgresql"
-    queries: "./db/model/user/query.sql"
-    schema: "./db/model/user/query.sql"
+    queries: "./db/store/user/query.sql"
+    schema: "./db/store/user/query.sql"
     gen:
       go:
         package: "user"
-        out: "./db/model/user/"
+        out: "./db/store/user/"
         emit_interface: true
         emit_empty_slices: true
         emit_json_tags: true

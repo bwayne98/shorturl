@@ -26,7 +26,7 @@ func RandUrl() string {
 	return list[index]
 }
 
-func randInt(min, max int64) int64 {
+func RandInt(min, max int64) int64 {
 	return min + r.Int63n(max-min+1)
 }
 

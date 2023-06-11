@@ -6,7 +6,6 @@ package shorturl
 
 import (
 	"context"
-	"database/sql"
 )
 
 type Querier interface {
@@ -14,7 +13,7 @@ type Querier interface {
 	CreateShorturl(ctx context.Context, arg CreateShorturlParams) (Shorturl, error)
 	DeleteShorturl(ctx context.Context, arg DeleteShorturlParams) error
 	GetMatchShorturl(ctx context.Context, match string) (string, error)
-	ListUserShorturl(ctx context.Context, userID sql.NullInt32) ([]ListUserShorturlRow, error)
+	ListUserShorturl(ctx context.Context, userID int32) ([]ListUserShorturlRow, error)
 	UpdateExpired(ctx context.Context, arg UpdateExpiredParams) (Shorturl, error)
 }
 

@@ -3,16 +3,11 @@ package main
 import (
 	"database/sql"
 	"log"
-	"os/user"
-	"shorturl/m/service/member"
-	"shorturl/m/service/short"
+	"shorturl/m/api"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
-
-var Route *gin.Engine
-var User user.User
 
 func main() {
 
@@ -21,14 +16,9 @@ func main() {
 		log.Fatal("cant connect to db:", err)
 	}
 
-	Route = gin.Default()
-	ApiGroup := Route.Group("/api")
+	route := gin.Default()
 
-	memberGroup := ApiGroup.Group("/member")
-	member.Register(memberGroup)
+	server := api.New(db, route)
 
-	shortGroup := ApiGroup.Group("/short")
-	short.Register(shortGroup, db)
-
-	Route.Run("0.0.0.0:8000")
+	server.Run("8000")
 }

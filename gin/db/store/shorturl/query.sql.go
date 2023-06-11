@@ -7,7 +7,6 @@ package shorturl
 
 import (
 	"context"
-	"database/sql"
 	"time"
 )
 
@@ -32,10 +31,10 @@ RETURNING id, user_id, origin, match, expired_at, updated_at, created_at
 `
 
 type CreateShorturlParams struct {
-	Origin    string        `json:"origin"`
-	Match     string        `json:"match"`
-	UserID    sql.NullInt32 `json:"user_id"`
-	ExpiredAt time.Time     `json:"expired_at"`
+	Origin    string    `json:"origin"`
+	Match     string    `json:"match"`
+	UserID    int32     `json:"user_id"`
+	ExpiredAt time.Time `json:"expired_at"`
 }
 
 func (q *Queries) CreateShorturl(ctx context.Context, arg CreateShorturlParams) (Shorturl, error) {
@@ -65,8 +64,8 @@ AND user_id = $2
 `
 
 type DeleteShorturlParams struct {
-	ID     int32         `json:"id"`
-	UserID sql.NullInt32 `json:"user_id"`
+	ID     int32 `json:"id"`
+	UserID int32 `json:"user_id"`
 }
 
 func (q *Queries) DeleteShorturl(ctx context.Context, arg DeleteShorturlParams) error {
@@ -101,7 +100,7 @@ type ListUserShorturlRow struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (q *Queries) ListUserShorturl(ctx context.Context, userID sql.NullInt32) ([]ListUserShorturlRow, error) {
+func (q *Queries) ListUserShorturl(ctx context.Context, userID int32) ([]ListUserShorturlRow, error) {
 	rows, err := q.db.QueryContext(ctx, listUserShorturl, userID)
 	if err != nil {
 		return nil, err
