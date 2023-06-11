@@ -8,7 +8,7 @@ import (
 
 var r *rand.Rand
 
-const chars = "abcdefghijklmnopqrstuvwxyz"
+const chars = "abcdefghijklmnopqrstuvwxyz123456789ABCDEFGHIJKLMNPQRSTUVWXYZ"
 
 func init() {
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
