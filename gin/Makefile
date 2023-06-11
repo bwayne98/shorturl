@@ -1,4 +1,4 @@
-include .env
+include gin.env
 
 migrateup:
 	migrate -path=db/migration -database "postgresql://${PG_USERNAME}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_DATABASE}?sslmode=disable" up
@@ -19,6 +19,6 @@ test:
 	go test -v -cover ./...
 
 mock:
-	go generate ./...
+	mockgen -destination db/store/mock.go -package store shorturl/m/db/store Querier
 
 .PHONY: migrateup migratedown install sqlc test mock
