@@ -1,4 +1,4 @@
-package shorturl
+package store
 
 import (
 	"context"
@@ -24,13 +24,12 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func creatRandomShorturl(t *testing.T, userID int32) Shorturl {
-
+func creatRandomShorturl(t *testing.T, userID int) Shorturl {
 
 	params := CreateShorturlParams{
-		Origin: util.RandUrl(),
-		Match:  util.RandString(10),
-		UserID: userID,
+		Origin:    util.RandUrl(),
+		Match:     util.RandString(10),
+		UserID:    int32(userID),
 		ExpiredAt: time.Now().Add(time.Hour * 2),
 	}
 
@@ -77,9 +76,52 @@ func TestDeleteShorturl(t *testing.T) {
 
 	empty, err2 := testQuery.GetMatchShorturl(context.Background(), shorturl.Match)
 
-	log.Printf(shorturl.Match)
-
 	require.Error(t, err2)
 	require.Empty(t, empty)
+}
 
+func TestListUserShorturl(t *testing.T) {
+
+	userID := 19
+
+	for i := 5; i < 10; i++ {
+		creatRandomShorturl(t, userID)
+	}
+
+	list, err := testQuery.ListUserShorturl(context.Background(), int32(userID))
+
+	require.NoError(t, err)
+
+	for _, s := range list {
+		require.Equal(t, s.UserID, int32(userID))
+	}
+
+}
+
+func TestUpdateExpired(t *testing.T) {
+	shorturl1 := creatRandomShorturl(t, 11)
+
+	shorturl2, err := testQuery.UpdateExpired(context.Background(), UpdateExpiredParams{
+		ID:        shorturl1.ID,
+		ExpiredAt: time.Now().Add(time.Hour * 1),
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, shorturl1.ID, shorturl2.ID)
+	require.Equal(t, shorturl1.UserID, shorturl2.UserID)
+	require.Equal(t, shorturl1.UserID, shorturl2.UserID)
+	require.Equal(t, shorturl1.Origin, shorturl2.Origin)
+	require.Equal(t, shorturl1.Match, shorturl2.Match)
+	require.Equal(t, shorturl1.CreatedAt, shorturl2.CreatedAt)
+	require.NotEqual(t, shorturl1.ExpiredAt, shorturl2.ExpiredAt)
+
+}
+
+func TestCountMatchShorturl(t *testing.T) {
+	shorturl := creatRandomShorturl(t, 31)
+
+	count, err := testQuery.CountMatchShorturl(context.Background(), shorturl.Match)
+
+	require.NoError(t, err)
+	require.Equal(t, 1, int(count))
 }
