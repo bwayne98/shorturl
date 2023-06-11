@@ -33,7 +33,7 @@ WHERE id = $1
 AND user_id = $2;
 
 -- name: ListUserShorturl :many
-SELECT id, origin, match, expired_at, created_at
+SELECT id, origin, match, user_id, expired_at, created_at
 FROM shorturls
 WHERE user_id = $1;
 

@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.18.0
 
-package shorturl
+package store
 
 import (
 	"database/sql"
@@ -17,4 +17,11 @@ type Shorturl struct {
 	ExpiredAt time.Time    `json:"expired_at"`
 	UpdatedAt sql.NullTime `json:"updated_at"`
 	CreatedAt time.Time    `json:"created_at"`
+}
+
+type User struct {
+	ID        int32        `json:"id"`
+	Name      string       `json:"name"`
+	LineID    string       `json:"line_id"`
+	CreatedAt sql.NullTime `json:"created_at"`
 }

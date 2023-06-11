@@ -1,14 +1,14 @@
 package short
 
 import (
-	"database/sql"
+	"shorturl/m/db/store"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Default(route *gin.RouterGroup, db *sql.DB) {
+func Default(route *gin.RouterGroup, query store.Querier) {
 
-	controller := New(db)
+	controller := New(query)
 
 	route.POST("/make", controller.Make)
 	route.POST("/match", controller.Match)

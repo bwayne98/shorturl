@@ -3,7 +3,7 @@
 //   sqlc v1.18.0
 // source: query.sql
 
-package shorturl
+package store
 
 import (
 	"context"
@@ -57,6 +57,32 @@ func (q *Queries) CreateShorturl(ctx context.Context, arg CreateShorturlParams) 
 	return i, err
 }
 
+const createUser = `-- name: CreateUser :one
+INSERT INTO users(
+  name, line_id
+ ) VALUES (
+  $1, $2
+ )
+ RETURNING id, name, line_id, created_at
+`
+
+type CreateUserParams struct {
+	Name   string `json:"name"`
+	LineID string `json:"line_id"`
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, createUser, arg.Name, arg.LineID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.LineID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const deleteShorturl = `-- name: DeleteShorturl :exec
 DELETE FROM shorturls 
 WHERE id = $1 
@@ -73,6 +99,16 @@ func (q *Queries) DeleteShorturl(ctx context.Context, arg DeleteShorturlParams) 
 	return err
 }
 
+const deleteUser = `-- name: DeleteUser :exec
+ DELETE FROM users
+ WHERE id = $1
+`
+
+func (q *Queries) DeleteUser(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteUser, id)
+	return err
+}
+
 const getMatchShorturl = `-- name: GetMatchShorturl :one
 SELECT origin FROM shorturls 
 WHERE match = $1 AND expired_at > (now()) 
@@ -86,8 +122,26 @@ func (q *Queries) GetMatchShorturl(ctx context.Context, match string) (string, e
 	return origin, err
 }
 
+const getUser = `-- name: GetUser :one
+ SELECT id, name
+ FROM users
+ WHERE line_id = $1
+`
+
+type GetUserRow struct {
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
+}
+
+func (q *Queries) GetUser(ctx context.Context, lineID string) (GetUserRow, error) {
+	row := q.db.QueryRowContext(ctx, getUser, lineID)
+	var i GetUserRow
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
 const listUserShorturl = `-- name: ListUserShorturl :many
-SELECT id, origin, match, expired_at, created_at
+SELECT id, origin, match, user_id, expired_at, created_at
 FROM shorturls
 WHERE user_id = $1
 `
@@ -96,6 +150,7 @@ type ListUserShorturlRow struct {
 	ID        int32     `json:"id"`
 	Origin    string    `json:"origin"`
 	Match     string    `json:"match"`
+	UserID    int32     `json:"user_id"`
 	ExpiredAt time.Time `json:"expired_at"`
 	CreatedAt time.Time `json:"created_at"`
 }
@@ -113,6 +168,7 @@ func (q *Queries) ListUserShorturl(ctx context.Context, userID int32) ([]ListUse
 			&i.ID,
 			&i.Origin,
 			&i.Match,
+			&i.UserID,
 			&i.ExpiredAt,
 			&i.CreatedAt,
 		); err != nil {

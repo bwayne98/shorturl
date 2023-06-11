@@ -1,23 +1,27 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "./db/store/shorturl/query.sql"
-    schema: "./db/store/shorturl/query.sql"
+    queries: 
+      - "./db/store/shorturl/query.sql"
+      - "./db/store/user/query.sql"
+    schema: 
+      - "./db/store/shorturl/query.sql"
+      - "./db/store/user/query.sql"
     gen:
       go:
-        package: "shorturl"
-        out: "./db/store/shorturl/"
+        package: "store"
+        out: "./db/store/"
         emit_interface: true
         emit_empty_slices: true
         emit_json_tags: true
-  - engine: "postgresql"
-    queries: "./db/store/user/query.sql"
-    schema: "./db/store/user/query.sql"
-    gen:
-      go:
-        package: "user"
-        out: "./db/store/user/"
-        emit_interface: true
-        emit_empty_slices: true
-        emit_json_tags: true
+  # - engine: "postgresql"
+  #   queries: "./db/store/user/query.sql"
+  #   schema: "./db/store/user/query.sql"
+  #   gen:
+  #     go:
+  #       package: "user"
+  #       out: "./db/store/user/"
+  #       emit_interface: true
+  #       emit_empty_slices: true
+  #       emit_json_tags: true
 

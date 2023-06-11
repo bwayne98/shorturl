@@ -1,40 +1,40 @@
 package api
 
 import (
-	"database/sql"
 	"fmt"
 	"shorturl/m/api/member"
 	"shorturl/m/api/short"
+	"shorturl/m/db/store"
+	"shorturl/m/util"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	db    *sql.DB
-	route *gin.Engine
+	Config util.Config
+	Query  store.Querier
+	Router *gin.Engine
 }
 
-func New(db *sql.DB, route *gin.Engine) *Server {
+func NewServer(config util.Config, query store.Querier, router *gin.Engine) *Server {
 	return &Server{
-		db: db,
-		route: route,
+		Config: config,
+		Query:  query,
+		Router: router,
 	}
 }
 
 func (s *Server) Run(port string) {
-	s.setupRoute()
-	s.route.Run(fmt.Sprintf("0.0.0.0:%s", port))
+	s.Router.Run(fmt.Sprintf("0.0.0.0:%s", port))
 }
 
-func (s *Server) setupRoute(){
-	
-	ApiGroup := s.route.Group("/api")
+func (s *Server) SetupRoute() {
+
+	ApiGroup := s.Router.Group("/api")
 
 	memberGroup := ApiGroup.Group("/member")
 	member.Default(memberGroup)
 
 	shortGroup := ApiGroup.Group("/short")
-	short.Default(shortGroup, s.db)
+	short.Default(shortGroup, s.Query)
 }
-
-

@@ -2,11 +2,10 @@ package short
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"net/http"
 	"regexp"
-	"shorturl/m/db/store/shorturl"
+	"shorturl/m/db/store"
 	"shorturl/m/util"
 	"time"
 
@@ -18,11 +17,11 @@ const (
 )
 
 type Controller struct {
-	db *sql.DB
+	query store.Querier
 }
 
-func New(db *sql.DB) *Controller {
-	return &Controller{db}
+func New(query store.Querier) *Controller {
+	return &Controller{query}
 }
 
 type MakeReq struct {
@@ -43,15 +42,13 @@ func (cont *Controller) Make(c *gin.Context) {
 		return
 	}
 
-	shorturlQuery := shorturl.New(cont.db)
-
 	var match string
-	if err := getUniqueMatch(shorturlQuery, &match); err != nil {
+	if err := cont.getUniqueMatch(&match); err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	shorturl, err := shorturlQuery.CreateShorturl(context.Background(), shorturl.CreateShorturlParams{
+	shorturl, err := cont.query.CreateShorturl(context.Background(), store.CreateShorturlParams{
 		Origin:    req.Origin,
 		Match:     match,
 		ExpiredAt: time.Now().Add(expaired_time),
@@ -70,11 +67,11 @@ func (cont *Controller) Make(c *gin.Context) {
 	})
 }
 
-func getUniqueMatch(query *shorturl.Queries, match *string) (err error) {
+func (cont *Controller) getUniqueMatch(match *string) (err error) {
 	exist := true
 	for exist {
 		*match = util.RandString(10)
-		count, e := query.CountMatchShorturl(context.Background(), *match)
+		count, e := cont.query.CountMatchShorturl(context.Background(), *match)
 		if e != nil {
 			err = e
 			return
@@ -96,8 +93,7 @@ func (cont *Controller) Match(c *gin.Context) {
 		return
 	}
 
-	shorturlQuery := shorturl.New(cont.db)
-	redirectUrl, err := shorturlQuery.GetMatchShorturl(context.Background(), req.Match)
+	redirectUrl, err := cont.query.GetMatchShorturl(context.Background(), req.Match)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, err)

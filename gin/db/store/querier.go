@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.18.0
 
-package shorturl
+package store
 
 import (
 	"context"
@@ -11,8 +11,11 @@ import (
 type Querier interface {
 	CountMatchShorturl(ctx context.Context, match string) (int64, error)
 	CreateShorturl(ctx context.Context, arg CreateShorturlParams) (Shorturl, error)
+	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteShorturl(ctx context.Context, arg DeleteShorturlParams) error
+	DeleteUser(ctx context.Context, id int32) error
 	GetMatchShorturl(ctx context.Context, match string) (string, error)
+	GetUser(ctx context.Context, lineID string) (GetUserRow, error)
 	ListUserShorturl(ctx context.Context, userID int32) ([]ListUserShorturlRow, error)
 	UpdateExpired(ctx context.Context, arg UpdateExpiredParams) (Shorturl, error)
 }
